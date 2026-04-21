@@ -1,0 +1,23 @@
+<resources>
+    <!--  Brand Colors  -->
+    <color name="primary">#6C3CE1</color>
+    <color name="primary_dark">#5028C8</color>
+    <color name="primary_light">#EDE7FF</color>
+    <!--  Backgrounds  -->
+    <color name="background">#F5F6FA</color>
+    <color name="white">#FFFFFF</color>
+    <color name="category_bg">#EDE7FF</color>
+    <!--  Text Colors  -->
+    <color name="text_primary">#1A1A2E</color>
+    <color name="text_secondary">#555577</color>
+    <color name="text_hint">#AAAACC</color>
+    <!--  Badge Colors  -->
+    <color name="badge_offering_bg">#E8F5E9</color>
+    <color name="badge_offering_text">#2E7D32</color>
+    <color name="badge_looking_bg">#FFF3E0</color>
+    <color name="badge_looking_text">#E65100</color>
+    <!--  Misc  -->
+    <color name="star_color">#FFC107</color>
+    <color name="divider">#EEEEEE</color>
+    <color name="ripple">#1A6C3CE1</color>
+</resources>
