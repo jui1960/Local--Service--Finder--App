@@ -125,7 +125,7 @@
                 android:layout_height="22dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_eye_off"
+                android:src="@drawable/eye"
                 app:tint="@color/text_hint" />
         </LinearLayout>
         <!--  Forgot Password  -->

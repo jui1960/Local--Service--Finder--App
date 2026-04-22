@@ -120,7 +120,7 @@
                 android:id="@+id/tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="auto"
+                android:layout_marginTop="0dp"
                 android:text="৳ 500"
                 android:textColor="@color/primary"
                 android:textSize="13sp"
