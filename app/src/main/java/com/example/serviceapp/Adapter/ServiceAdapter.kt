@@ -1,10 +1,12 @@
-package com.example.serviceapp
+package com.example.serviceapp.Adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.serviceapp.R
+import com.example.serviceapp.Model.ServicePost
 import com.example.serviceapp.databinding.ItemServiceCardBinding
 
 class ServiceAdapter(

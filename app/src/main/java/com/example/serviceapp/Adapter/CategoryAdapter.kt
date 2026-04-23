@@ -1,8 +1,10 @@
-package com.example.serviceapp
+package com.example.serviceapp.Adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.serviceapp.Model.Category
+import com.example.serviceapp.R
 import com.example.serviceapp.databinding.ItemCategoryBinding
 
 class CategoryAdapter(

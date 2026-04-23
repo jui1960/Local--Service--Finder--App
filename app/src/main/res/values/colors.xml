@@ -9,6 +9,8 @@
     <color name="category_bg">#EDE7FF</color>
     <!--  Text Colors  -->
     <color name="text_primary">#1A1A2E</color>
+    <color name="black">#070707</color>
+
     <color name="text_secondary">#555577</color>
     <color name="text_hint">#AAAACC</color>
     <!--  Badge Colors  -->
@@ -20,4 +22,10 @@
     <color name="star_color">#FFC107</color>
     <color name="divider">#EEEEEE</color>
     <color name="ripple">#1A6C3CE1</color>
+
+    <color name="strength_weak">#F44336</color>
+    <color name="strength_fair">#FF9800</color>
+    <color name="strength_good">#FFC107</color>
+    <color name="strength_strong">#4CAF50</color>
+
 </resources>
