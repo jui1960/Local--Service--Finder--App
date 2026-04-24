@@ -1,10 +1,25 @@
 package com.example.serviceapp.Repository
 
+import android.net.Uri
 import com.example.serviceapp.Model.Category
-import com.example.serviceapp.R
 import com.example.serviceapp.Model.ServicePost
+import com.example.serviceapp.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 class AppRepository {
+
+    private val firestore = FirebaseFirestore.getInstance()
+    private val storage   = FirebaseStorage.getInstance()
+    private val auth      = FirebaseAuth.getInstance()
+
+    private val servicesCollection = firestore.collection("services")
+
+    // ─── CATEGORIES (static) ──────────────────────────────────
     fun getCategories(): List<Category> {
         return listOf(
             Category(1, "Cleaning",    R.drawable.cleaning),
@@ -18,91 +33,123 @@ class AppRepository {
         )
     }
 
-    fun getServiceById(serviceId: Int): ServicePost? {
-        return getAllServices().find { it.id == serviceId }
+    fun getCategoryNames(): List<String> = getCategories().map { it.name }
+
+    // ─── REALTIME LISTENER (HomeViewModel uses this) ──────────
+    fun listenToServices(
+        onUpdate: (List<ServicePost>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        return servicesCollection
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+                val posts = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(ServicePost::class.java)
+                } ?: emptyList()
+                onUpdate(posts)
+            }
     }
 
-    fun toggleBookmark(serviceId: Int): Boolean {
-        // In real app: update Firestore user bookmarks collection
-        // Returns new bookmark state
-        return true // placeholder
+    // ─── FETCH SINGLE SERVICE (ServiceDetailsActivity uses this)
+    suspend fun getServiceById(serviceId: String): ServicePost? {
+        return try {
+            val doc = servicesCollection.document(serviceId).get().await()
+            doc.toObject(ServicePost::class.java)
+        } catch (e: Exception) {
+            null
+        }
     }
 
-    // Services fetch korar function
-    private fun getAllServices(): List<ServicePost> {
-        return listOf(
-            ServicePost(
-                id = 1,
-                title = "I will do professional House Cleaning",
-                providerName = "John Doe",
-                providerUsername = "@johndoe",
-                rating = 4.8f,
-                reviewCount = 120,
-                price = 500,
-                imageRes = R.drawable.img3,
-                isOffering = true,
-                description = "I provide professional house cleaning services. " +
-                        "I will clean your home, kitchen, bathroom perfectly. " +
-                        "All cleaning supplies included. Satisfaction guaranteed.",
-                location = "Dhaka, Bangladesh",
-                phone = "+880 1700-000000",
-                skills = listOf("Cleaning", "Kitchen", "Bathroom", "Deep Clean")
-            ),
-            ServicePost(
-                id = 2,
-                title = "Need a Plumber for Pipe Repair",
-                providerName = "Alex Smith",
-                providerUsername = "@alexsmith",
-                rating = 4.6f,
-                reviewCount = 80,
-                price = 700,
-                imageRes = R.drawable.img2,
-                isOffering = true,
-                description = "Expert plumber with 10+ years experience. " +
-                        "All pipe-related issues fixed quickly and professionally.",
-                location = "Dhaka, Bangladesh",
-                phone = "+880 1800-111111",
-                skills = listOf("Plumbing", "Pipe Repair", "Water Leak", "Installation")
-            ),
-            ServicePost(
-                id = 3,
-                title = "Need Electrician for Office Wiring",
-                providerName = "Sarah Ahmed",
-                providerUsername = "@sarahahmed",
-                rating = 4.7f,
-                reviewCount = 60,
-                price = 1000,
-                imageRes = R.drawable.img_2,
-                isOffering = false,
-                description = "Looking for a licensed electrician to set up full office wiring. " +
-                        "Must have experience with commercial installations.",
-                location = "Dhaka, Bangladesh",
-                phone = "+880 1900-222222",
-                skills = listOf("Electrician", "Wiring", "Office Setup")
-            ),
-            ServicePost(
-                id = 4,
-                title = "Carpentry Work (Shelves, Furniture)",
-                providerName = "Mike Johnson",
-                providerUsername = "@mikejohnson",
-                rating = 4.9f,
-                reviewCount = 150,
-                price = 1500,
-                imageRes = R.drawable.img_3,
-                isOffering = true,
-                description = "Custom furniture and shelf building. All wood types handled. " +
-                        "Precision craftsmanship with years of experience.",
-                location = "Dhaka, Bangladesh",
-                phone = "+880 1600-333333",
-                skills = listOf("Carpentry", "Furniture", "Wood Work", "Shelves")
-            )
+    // ─── BOOKMARK TOGGLE ──────────────────────────────────────
+    suspend fun toggleBookmark(serviceId: String, currentState: Boolean): Boolean {
+        val uid = auth.currentUser?.uid ?: return false
+        val bookmarkRef = firestore
+            .collection("users")
+            .document(uid)
+            .collection("bookmarks")
+            .document(serviceId)
+        return try {
+            if (currentState) {
+                bookmarkRef.delete().await()
+                false
+            } else {
+                bookmarkRef.set(mapOf("serviceId" to serviceId)).await()
+                true
+            }
+        } catch (e: Exception) {
+            currentState
+        }
+    }
+
+    // ─── VALIDATION ───────────────────────────────────────────
+    fun validatePost(
+        title: String,
+        category: String,
+        description: String,
+        price: String,
+        location: String
+    ): String? {
+        if (title.isBlank())       return "Title is required"
+        if (category.isBlank())    return "Please select a category"
+        if (description.isBlank()) return "Description is required"
+        if (price.isBlank() || price.toIntOrNull() == null || price.toInt() <= 0)
+            return "Enter a valid price"
+        if (location.isBlank())    return "Location is required"
+        return null
+    }
+
+    // ─── UPLOAD IMAGES to Firebase Storage ───────────────────
+    suspend fun uploadImages(localUris: List<String>): List<String> {
+        val uid = auth.currentUser?.uid ?: "anonymous"
+        val downloadUrls = mutableListOf<String>()
+        for (uriString in localUris) {
+            val uri = Uri.parse(uriString)
+            val fileName = "services/$uid/${System.currentTimeMillis()}_${uri.lastPathSegment}"
+            val ref = storage.reference.child(fileName)
+            ref.putFile(uri).await()
+            val downloadUrl = ref.downloadUrl.await().toString()
+            downloadUrls.add(downloadUrl)
+        }
+        return downloadUrls
+    }
+
+    // ─── SUBMIT POST to Firestore ─────────────────────────────
+    suspend fun submitPost(
+        title: String,
+        category: String,
+        description: String,
+        price: Int,
+        location: String,
+        isOffering: Boolean,
+        uploadedImageUrls: List<String>
+    ): ServicePost {
+        val user = auth.currentUser
+        val uid  = user?.uid ?: ""
+
+        val newPost = ServicePost(
+            title            = title,
+            providerName     = user?.displayName ?: "Unknown",
+            providerUsername = "@${user?.displayName?.lowercase()?.replace(" ", "") ?: "user"}",
+            rating           = 0f,
+            reviewCount      = 0,
+            price            = price,
+            imageRes         = 0,
+            isOffering       = isOffering,
+            description      = description,
+            location         = location,
+            phone            = user?.phoneNumber ?: "",
+            skills           = listOf(category),
+            isBookmarked     = false,
+            imageUrls        = uploadedImageUrls,
+            providerId       = uid,
+            createdAt        = System.currentTimeMillis()
         )
+
+        val docRef = servicesCollection.add(newPost).await()
+        return newPost.copy(id = docRef.id)
     }
-
-    fun getServices(): List<ServicePost> {
-        return getAllServices()
-    }
-
-
-
 }

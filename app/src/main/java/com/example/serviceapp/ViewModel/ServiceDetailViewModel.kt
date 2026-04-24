@@ -3,8 +3,10 @@ package com.example.serviceapp.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope // Eti add korun
 import com.example.serviceapp.Model.ServicePost
 import com.example.serviceapp.Repository.AppRepository
+import kotlinx.coroutines.launch // Eti add korun
 
 class ServiceDetailViewModel : ViewModel() {
 
@@ -20,10 +22,18 @@ class ServiceDetailViewModel : ViewModel() {
     val toastMessage: LiveData<String> = _toastMessage
 
     // Load service data by ID
-    fun loadService(serviceId: Int) {
-        val service = repository.getServiceById(serviceId)
-        _serviceDetail.value = service
-        _isBookmarked.value = service?.isBookmarked ?: false
+    // Note: serviceId-ke String-e convert korun jodi Firestore bebohar koren
+    fun loadService(serviceId: String) {
+        // 🔥 ERROR FIX: Coroutine scope shuru korun
+        viewModelScope.launch {
+            try {
+                val service = repository.getServiceById(serviceId)
+                _serviceDetail.value = service
+                _isBookmarked.value = service?.isBookmarked ?: false
+            } catch (e: Exception) {
+                _toastMessage.value = "Error loading service: ${e.message}"
+            }
+        }
     }
 
     // Toggle bookmark state
@@ -34,9 +44,7 @@ class ServiceDetailViewModel : ViewModel() {
         _toastMessage.value = msg
     }
 
-    // Message button pressed
     fun onMessageClick() {
         _toastMessage.value = "Opening chat..."
-        // In real app: navigate to ChatActivity with providerId
     }
 }

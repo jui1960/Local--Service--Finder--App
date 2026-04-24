@@ -26,9 +26,9 @@ class ServiceDetailsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Get service ID passed from HomeScreen or SearchActivity
-        val serviceId = intent.getIntExtra(EXTRA_SERVICE_ID, -1)
-        if (serviceId == -1) {
-            Toast.makeText(this, "Service not found", Toast.LENGTH_SHORT).show()
+        val serviceId = intent.getStringExtra(EXTRA_SERVICE_ID)
+        if (serviceId.isNullOrEmpty()) {
+            Toast.makeText(this, "Service ID is missing", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
