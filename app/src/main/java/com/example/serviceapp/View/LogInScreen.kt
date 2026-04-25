@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.serviceapp.R
@@ -24,6 +23,17 @@ class LogInScreen : AppCompatActivity() {
 
         observeViewModel()
         setupListeners()
+
+        binding.btnLogin.setOnClickListener {
+            if (validateInputs()) {
+                val email = binding.etEmail.text.toString().trim()
+                val password = binding.etPassword.text.toString().trim()
+                authViewModel.loginUser(email, password)
+            }
+        }
+
+
+
     }
 
     private fun observeViewModel() {
@@ -86,4 +96,6 @@ class LogInScreen : AppCompatActivity() {
         startActivity(intent)
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
+
+
 }

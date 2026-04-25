@@ -54,7 +54,11 @@ class HomeViewModel : ViewModel() {
                 _errorMessage.value = "Failed to load services: ${exception.message}"
             }
         )
+
+
     }
+
+
 
     // Call this to manually retry after an error
     fun retryLoading() {

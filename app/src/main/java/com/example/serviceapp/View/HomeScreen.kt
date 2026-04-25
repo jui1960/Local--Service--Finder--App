@@ -30,6 +30,7 @@ class HomeScreen : AppCompatActivity() {
         }
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
@@ -39,7 +40,13 @@ class HomeScreen : AppCompatActivity() {
         setupAdapters()
         observeViewModel()   // ← only called once
         setupBottomNav()
+
+        binding.tabProfile.setOnClickListener {
+            val intent = Intent(this, UserProfile::class.java)
+            startActivity(intent)
+        }
     }
+
 
     // ─── SINGLE observeViewModel (Firebase version) ───────────
     private fun observeViewModel() {
@@ -124,4 +131,6 @@ class HomeScreen : AppCompatActivity() {
             Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 }

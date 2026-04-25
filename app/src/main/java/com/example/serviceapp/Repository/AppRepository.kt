@@ -3,6 +3,7 @@ package com.example.serviceapp.Repository
 import android.net.Uri
 import com.example.serviceapp.Model.Category
 import com.example.serviceapp.Model.ServicePost
+import com.example.serviceapp.Model.UserProfile
 import com.example.serviceapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -152,4 +153,98 @@ class AppRepository {
         val docRef = servicesCollection.add(newPost).await()
         return newPost.copy(id = docRef.id)
     }
+
+
+
+    // Registration logic
+    suspend fun signUpWithEmail(email: String, pass: String, fullName: String): Boolean {
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, pass).await()
+            val uid = result.user?.uid
+            if (uid != null) {
+                // Register hole user profile-o create kora dorkar
+                val initialProfile = UserProfile(
+                    uid = uid,
+                    fullName = fullName,
+                    email = email,
+                    createdAt = System.currentTimeMillis()
+                )
+                usersCollection.document(uid).set(initialProfile).await()
+                true
+            } else false
+        } catch (e: Exception) {
+            throw e // ViewModel-e error message dekhate hobe
+        }
+    }
+
+    // Login logic
+    suspend fun signInWithEmail(email: String, pass: String): Boolean {
+        return try {
+            auth.signInWithEmailAndPassword(email, pass).await()
+            true
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+
+    //profile screen
+
+    private val usersCollection = firestore.collection("users")
+
+    // Fetch current user profile
+    suspend fun getUserProfile(uid: String): UserProfile? {
+        return try {
+            val doc = usersCollection.document(uid).get().await()
+            doc.toObject(UserProfile::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // Fetch posts by a specific user
+    fun listenToUserPosts(
+        uid: String,
+        onUpdate: (List<ServicePost>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        return servicesCollection
+            .whereEqualTo("providerId", uid)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) { onError(error); return@addSnapshotListener }
+                val posts = snapshot?.documents?.mapNotNull {
+                    it.toObject(ServicePost::class.java)
+                } ?: emptyList()
+                onUpdate(posts)
+            }
+    }
+
+    // Fetch bookmarked service IDs for current user
+    suspend fun getBookmarkedIds(uid: String): List<String> {
+        return try {
+            val docs = usersCollection.document(uid)
+                .collection("bookmarks").get().await()
+            docs.documents.mapNotNull { it.getString("serviceId") }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    // Update user profile fields
+    suspend fun updateUserProfile(uid: String, updates: Map<String, Any>): Boolean {
+        return try {
+            usersCollection.document(uid).update(updates).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Sign out
+    fun signOut() {
+        auth.signOut()
+    }
+
+
 }

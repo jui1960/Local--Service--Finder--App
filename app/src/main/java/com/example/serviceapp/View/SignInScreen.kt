@@ -27,6 +27,16 @@ class SignInScreen : AppCompatActivity() {
         observeViewModel()
         setupListeners()
         setupPasswordStrengthWatcher()
+
+
+        binding.btnRegister.setOnClickListener {
+            if (validateInputs()) {
+                val email = binding.etEmail.text.toString().trim()
+                val password = binding.etPassword.text.toString().trim()
+                val name = binding.etFullName.text.toString().trim()
+                authViewModel.registerUser(email, password, name)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -61,6 +71,9 @@ class SignInScreen : AppCompatActivity() {
         }
 
         binding.tvLogin.setOnClickListener { finish() }
+
+
+
     }
 
     private fun setupPasswordStrengthWatcher() {
