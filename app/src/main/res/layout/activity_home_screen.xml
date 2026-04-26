@@ -306,8 +306,17 @@
             android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-            <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/search" app:tint="#9E9E9E" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Explore" android:textColor="#9E9E9E" android:textSize="10sp" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="22dp"
+                android:src="@drawable/search"
+                app:tint="#9E9E9E" />
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Explore"
+                android:textColor="#9E9E9E"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout

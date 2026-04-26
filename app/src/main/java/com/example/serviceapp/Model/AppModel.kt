@@ -28,3 +28,8 @@ data class Category(
     val name: String,
     val iconRes: Int
 )
+
+
+enum class SearchSortOrder {
+    NEWEST, POPULAR, PRICE_LOW, PRICE_HIGH
+}

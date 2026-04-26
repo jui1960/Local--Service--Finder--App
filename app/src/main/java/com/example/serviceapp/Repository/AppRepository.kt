@@ -2,6 +2,7 @@ package com.example.serviceapp.Repository
 
 import android.net.Uri
 import com.example.serviceapp.Model.Category
+import com.example.serviceapp.Model.SearchSortOrder
 import com.example.serviceapp.Model.ServicePost
 import com.example.serviceapp.Model.UserProfile
 import com.example.serviceapp.R
@@ -20,6 +21,20 @@ class AppRepository {
 
     private val servicesCollection = firestore.collection("services")
 
+
+    suspend fun getServiceById(serviceId: String): ServicePost? {
+        return try {
+            // services collection theke document fetch kora
+            val doc = servicesCollection.document(serviceId).get().await()
+            val service = doc.toObject(ServicePost::class.java)
+
+            // Document-er ID-ti model class-e manually set kora
+            service?.copy(id = doc.id)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     // ─── CATEGORIES (static) ──────────────────────────────────
     fun getCategories(): List<Category> {
         return listOf(
@@ -37,33 +52,7 @@ class AppRepository {
     fun getCategoryNames(): List<String> = getCategories().map { it.name }
 
     // ─── REALTIME LISTENER (HomeViewModel uses this) ──────────
-    fun listenToServices(
-        onUpdate: (List<ServicePost>) -> Unit,
-        onError: (Exception) -> Unit
-    ): ListenerRegistration {
-        return servicesCollection
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    onError(error)
-                    return@addSnapshotListener
-                }
-                val posts = snapshot?.documents?.mapNotNull { doc ->
-                    doc.toObject(ServicePost::class.java)
-                } ?: emptyList()
-                onUpdate(posts)
-            }
-    }
 
-    // ─── FETCH SINGLE SERVICE (ServiceDetailsActivity uses this)
-    suspend fun getServiceById(serviceId: String): ServicePost? {
-        return try {
-            val doc = servicesCollection.document(serviceId).get().await()
-            doc.toObject(ServicePost::class.java)
-        } catch (e: Exception) {
-            null
-        }
-    }
 
     // ─── BOOKMARK TOGGLE ──────────────────────────────────────
     suspend fun toggleBookmark(serviceId: String, currentState: Boolean): Boolean {
@@ -86,7 +75,7 @@ class AppRepository {
         }
     }
 
-    // ─── VALIDATION ───────────────────────────────────────────
+// VALIDATION
     fun validatePost(
         title: String,
         category: String,
@@ -187,6 +176,12 @@ class AppRepository {
         }
     }
 
+    // Sign out
+    fun signOut() {
+        auth.signOut()
+    }
+
+
 
     //profile screen
 
@@ -202,6 +197,26 @@ class AppRepository {
         }
     }
 
+    fun listenToServices(
+        onUpdate: (List<ServicePost>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        return servicesCollection
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+                val posts = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(ServicePost::class.java)
+                } ?: emptyList()
+
+                // ✅ Sort client-side
+                val sorted = posts.sortedByDescending { it.createdAt }
+                onUpdate(sorted)
+            }
+    }
+
     // Fetch posts by a specific user
     fun listenToUserPosts(
         uid: String,
@@ -210,13 +225,17 @@ class AppRepository {
     ): ListenerRegistration {
         return servicesCollection
             .whereEqualTo("providerId", uid)
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) { onError(error); return@addSnapshotListener }
+                       .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
                 val posts = snapshot?.documents?.mapNotNull {
                     it.toObject(ServicePost::class.java)
                 } ?: emptyList()
-                onUpdate(posts)
+
+                val sorted = posts.sortedByDescending { it.createdAt }
+                onUpdate(sorted)
             }
     }
 
@@ -241,9 +260,63 @@ class AppRepository {
         }
     }
 
-    // Sign out
-    fun signOut() {
-        auth.signOut()
+
+
+    //search
+    fun searchServices(
+        query: String,
+        category: String?,
+        maxPrice: Int?,
+        isOffering: Boolean?,
+        sortBy: SearchSortOrder,
+        onUpdate: (List<ServicePost>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        var ref: com.google.firebase.firestore.Query = servicesCollection
+
+        // Filter by category
+        if (!category.isNullOrBlank()) {
+            ref = ref.whereArrayContains("skills", category)
+        }
+
+        // Filter by offering/looking
+        if (isOffering != null) {
+            ref = ref.whereEqualTo("isOffering", isOffering)
+        }
+
+        // Sort
+        ref = when (sortBy) {
+            SearchSortOrder.NEWEST  -> ref.orderBy("createdAt", Query.Direction.DESCENDING)
+            SearchSortOrder.POPULAR -> ref.orderBy("reviewCount", Query.Direction.DESCENDING)
+            SearchSortOrder.PRICE_LOW  -> ref.orderBy("price", Query.Direction.ASCENDING)
+            SearchSortOrder.PRICE_HIGH -> ref.orderBy("price", Query.Direction.DESCENDING)
+        }
+
+        return ref.addSnapshotListener { snapshot, error ->
+            if (error != null) { onError(error); return@addSnapshotListener }
+
+            var posts = snapshot?.documents?.mapNotNull {
+                it.toObject(ServicePost::class.java)
+            } ?: emptyList()
+
+            // Client-side: text search filter (Firestore doesn't support full-text)
+            if (query.isNotBlank()) {
+                val q = query.lowercase()
+                posts = posts.filter {
+                    it.title.lowercase().contains(q) ||
+                            it.description.lowercase().contains(q) ||
+                            it.providerName.lowercase().contains(q) ||
+                            it.skills.any { s -> s.lowercase().contains(q) }
+                }
+            }
+
+            // Client-side: max price filter
+            if (maxPrice != null) {
+                posts = posts.filter { it.price <= maxPrice }
+            }
+
+            onUpdate(posts)
+        }
     }
 
 

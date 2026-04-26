@@ -3,14 +3,16 @@ package com.example.serviceapp.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope // Eti add korun
+import androidx.lifecycle.viewModelScope
 import com.example.serviceapp.Model.ServicePost
 import com.example.serviceapp.Repository.AppRepository
-import kotlinx.coroutines.launch // Eti add korun
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class ServiceDetailViewModel : ViewModel() {
 
     private val repository = AppRepository()
+    private val auth = FirebaseAuth.getInstance()
 
     private val _serviceDetail = MutableLiveData<ServicePost?>()
     val serviceDetail: LiveData<ServicePost?> = _serviceDetail
@@ -18,33 +20,48 @@ class ServiceDetailViewModel : ViewModel() {
     private val _isBookmarked = MutableLiveData<Boolean>()
     val isBookmarked: LiveData<Boolean> = _isBookmarked
 
-    private val _toastMessage = MutableLiveData<String>()
-    val toastMessage: LiveData<String> = _toastMessage
+    private val _toastMessage = MutableLiveData<String?>()
+    val toastMessage: LiveData<String?> = _toastMessage
 
     // Load service data by ID
-    // Note: serviceId-ke String-e convert korun jodi Firestore bebohar koren
     fun loadService(serviceId: String) {
-        // 🔥 ERROR FIX: Coroutine scope shuru korun
         viewModelScope.launch {
             try {
                 val service = repository.getServiceById(serviceId)
                 _serviceDetail.value = service
-                _isBookmarked.value = service?.isBookmarked ?: false
+
+                // Realtime check: User-er bookmark list-e ei ID-ti ache kina
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    val bookmarks = repository.getBookmarkedIds(uid)
+                    _isBookmarked.value = bookmarks.contains(serviceId)
+                }
             } catch (e: Exception) {
-                _toastMessage.value = "Error loading service: ${e.message}"
+                _toastMessage.value = "Error: ${e.localizedMessage}"
             }
         }
     }
 
-    // Toggle bookmark state
-    fun toggleBookmark() {
-        val current = _isBookmarked.value ?: false
-        _isBookmarked.value = !current
-        val msg = if (!current) "Added to bookmarks" else "Removed from bookmarks"
-        _toastMessage.value = msg
+    // Toggle bookmark state in Firestore
+    fun toggleBookmark(serviceId: String) {
+        val currentStatus = _isBookmarked.value ?: false
+
+        viewModelScope.launch {
+            try {
+                // Repository-r toggleBookmark call kora
+                val newState = repository.toggleBookmark(serviceId, currentStatus)
+                _isBookmarked.value = newState
+
+                _toastMessage.value = if (newState) "Added to bookmarks" else "Removed from bookmarks"
+            } catch (e: Exception) {
+                _toastMessage.value = "Failed to update bookmark"
+            }
+        }
     }
 
     fun onMessageClick() {
         _toastMessage.value = "Opening chat..."
     }
+
+    fun clearToast() { _toastMessage.value = null }
 }

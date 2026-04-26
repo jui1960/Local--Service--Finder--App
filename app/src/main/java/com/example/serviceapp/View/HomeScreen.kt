@@ -105,16 +105,33 @@ class HomeScreen : AppCompatActivity() {
     }
 
     private fun initListeners() {
-        binding.btnExploreNow.setOnClickListener { /* Explore logic */ }
-        binding.tvSeeAllCategories.setOnClickListener { /* See all categories */ }
-        binding.tvSeeAllServices.setOnClickListener { /* See all services */ }
+       /* binding.etSearch.setOnClickListener {
+            val intent = Intent(this, Search::class.java)
+            startActivity(intent)
+        }*/
+        binding.etSearch.isFocusable = false
+        binding.etSearch.isClickable = true
+
+        binding.btnExploreNow.setOnClickListener {
+            val intent = Intent(this, Search::class.java)
+            startActivity(intent)
+        }
+
+        binding.tvSeeAllCategories.setOnClickListener {
+            val intent = Intent(this, Search::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupBottomNav() {
-        binding.tabHome.setOnClickListener { /* Already on Home */ }
+
+        binding.tabHome.setOnClickListener {
+            // Already on Home
+        }
 
         binding.tabExplore.setOnClickListener {
-            Toast.makeText(this, "Explore Coming Soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, Search::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
         binding.tabPost.setOnClickListener {
@@ -124,11 +141,12 @@ class HomeScreen : AppCompatActivity() {
         }
 
         binding.tabChats.setOnClickListener {
-            Toast.makeText(this, "Chats", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Chats coming soon", Toast.LENGTH_SHORT).show()
         }
 
         binding.tabProfile.setOnClickListener {
-            Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, UserProfile::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 

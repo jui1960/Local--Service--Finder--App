@@ -125,17 +125,18 @@ class ServiceDetailsActivity : AppCompatActivity() {
         }
 
         // Bookmark button
+
         binding.ivBookmark.setOnClickListener {
-            viewModel.toggleBookmark()
+            val serviceId = intent.getStringExtra(EXTRA_SERVICE_ID) ?: ""
+            if (serviceId.isNotEmpty()) {
+                viewModel.toggleBookmark(serviceId)
+            }
         }
 
         // Message button
         binding.btnMessage.setOnClickListener {
             viewModel.onMessageClick()
-            // TODO: navigate to ChatActivity
-            // val intent = Intent(this, ChatActivity::class.java)
-            // intent.putExtra(ChatActivity.EXTRA_PROVIDER_ID, service.providerId)
-            // startActivity(intent)
+
         }
     }
 }
