@@ -8,6 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.example.serviceapp.ViewModel.ProfileViewModel
 import com.example.serviceapp.databinding.ActivityUserProfileBinding
@@ -18,23 +21,55 @@ class UserProfile : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 1. Edge-to-edge enable kora
         enableEdgeToEdge()
+
         binding = ActivityUserProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // 2. Padding logic set kora
+        setupEdgeToEdge()
         setupListeners()
         observeViewModel()
+    }
 
+    private fun setupEdgeToEdge() {
+        // Status/Nav bar icon color dark kora (Light theme-er jonno)
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = true
+        windowInsetsController.isAppearanceLightNavigationBars = true
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // 🟢 Top Bar Padding (Status Bar height adjust)
+            // XML-e apnar id holo 'topBarBg', tai ekhane 'topBarBg' use korte hobe
+            binding.topBarBg.setPadding(
+                binding.topBarBg.paddingLeft,
+                systemBars.top, // Status bar height
+                binding.topBarBg.paddingRight,
+                binding.topBarBg.paddingBottom
+            )
+
+            // 🔴 Bottom Nav Padding (System Nav height adjust)
+            binding.bottomNav.setPadding(
+                binding.bottomNav.paddingLeft,
+                binding.bottomNav.paddingTop,
+                binding.bottomNav.paddingRight,
+                systemBars.bottom // Navigation bar height
+            )
+
+            insets
+        }
     }
 
     private fun setupListeners() {
-        // Menu options
         binding.menuMyPosts.setOnClickListener {
-            // TODO: navigate to MyPostsActivity
             Toast.makeText(this, "My Posts", Toast.LENGTH_SHORT).show()
         }
 
         binding.menuSavedPosts.setOnClickListener {
-            // TODO: navigate to SavedPostsActivity
             Toast.makeText(this, "Saved Posts", Toast.LENGTH_SHORT).show()
         }
 
@@ -46,13 +81,10 @@ class UserProfile : AppCompatActivity() {
             Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
         }
 
-        // 3-dot menu → edit profile
         binding.btnMore.setOnClickListener {
             Toast.makeText(this, "Edit Profile", Toast.LENGTH_SHORT).show()
         }
 
-        // Sign out with confirmation dialog
-        // Sign out listener change korun:
         binding.menuLogout.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Log Out")
@@ -64,7 +96,6 @@ class UserProfile : AppCompatActivity() {
                 .show()
         }
 
-        // Bottom nav
         binding.tabHome.setOnClickListener {
             val intent = Intent(this, HomeScreen::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -81,8 +112,6 @@ class UserProfile : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-
-        // Profile data
         viewModel.profile.observe(this) { user ->
             if (user == null) return@observe
 
@@ -95,7 +124,6 @@ class UserProfile : AppCompatActivity() {
             binding.tvFollowerCount.text = formatCount(user.followerCount)
             binding.tvFollowingCount.text = user.followingCount.toString()
 
-            // Skills chips — add programmatically
             binding.chipGroupSkills.removeAllViews()
             user.skills.forEach { skill ->
                 val chip = com.google.android.material.chip.Chip(this)
@@ -106,27 +134,25 @@ class UserProfile : AppCompatActivity() {
                 binding.chipGroupSkills.addView(chip)
             }
 
-            // Profile image
             if (user.profileImageUrl.isNotBlank()) {
+                binding.tvInitials.visibility = View.GONE
+                binding.ivProfileImage.visibility = View.VISIBLE
                 Glide.with(this)
                     .load(user.profileImageUrl)
                     .circleCrop()
                     .placeholder(com.example.serviceapp.R.drawable.person1)
                     .into(binding.ivProfileImage)
             } else {
-                // Show initials if no image
                 binding.tvInitials.visibility = View.VISIBLE
                 binding.ivProfileImage.visibility = View.INVISIBLE
                 binding.tvInitials.text = getInitials(user.fullName)
             }
         }
 
-        // Loading
         viewModel.isLoading.observe(this) { loading ->
             binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         }
 
-        // Error
         viewModel.errorMessage.observe(this) { msg ->
             if (!msg.isNullOrBlank()) {
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
@@ -134,7 +160,6 @@ class UserProfile : AppCompatActivity() {
             }
         }
 
-        // Sign out → go to LoginActivity
         viewModel.signOutEvent.observe(this) { signedOut ->
             if (signedOut) {
                 val intent = Intent(this, LogInScreen::class.java)
@@ -145,7 +170,6 @@ class UserProfile : AppCompatActivity() {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────
     private fun getInitials(name: String): String {
         return name.trim().split(" ")
             .filter { it.isNotBlank() }

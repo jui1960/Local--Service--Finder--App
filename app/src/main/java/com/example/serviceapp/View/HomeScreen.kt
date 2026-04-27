@@ -35,6 +35,7 @@ class HomeScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupEdgeToEdge()
 
         initListeners()
         setupAdapters()
@@ -47,9 +48,36 @@ class HomeScreen : AppCompatActivity() {
         }
     }
 
+    private fun setupEdgeToEdge() {
+        // 🎨 Status/Nav bar icon color dark kora
+        val windowInsetsController = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = true
+        windowInsetsController.isAppearanceLightNavigationBars = true
 
-    // ─── SINGLE observeViewModel (Firebase version) ───────────
-    private fun observeViewModel() {
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+
+            // 🟢 Top Bar Padding (Status Bar height adjust)
+            binding.topBar.setPadding(
+                binding.topBar.paddingLeft,
+                systemBars.top,
+                binding.topBar.paddingRight,
+                binding.topBar.paddingBottom
+            )
+
+            // 🔴 Bottom Nav Padding (System Nav height adjust)
+            binding.bottomNav.setPadding(
+                binding.bottomNav.paddingLeft,
+                binding.bottomNav.paddingTop,
+                binding.bottomNav.paddingRight,
+                systemBars.bottom
+            )
+
+          
+
+            insets
+        }
+    }    private fun observeViewModel() {
 
         // Categories
         viewModel.categories.observe(this) { categories ->
