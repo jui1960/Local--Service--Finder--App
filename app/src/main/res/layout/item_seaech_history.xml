@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="52dp"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Recent search"
+        android:src="@drawable/history"
+      />
+
+    <TextView
+        android:id="@+id/tvSearchTerm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Plumbing service near me"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <ImageButton
+        android:id="@+id/ivRemove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="11dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Remove"
+        android:scaleType="fitCenter"
+        android:src="@drawable/close"
+        app:tint="#242424" />
+
+</LinearLayout>

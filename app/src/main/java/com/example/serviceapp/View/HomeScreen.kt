@@ -46,6 +46,10 @@ class HomeScreen : AppCompatActivity() {
             val intent = Intent(this, UserProfile::class.java)
             startActivity(intent)
         }
+
+        binding.etSearch.setOnClickListener {
+            startActivity(Intent(this, Search::class.java))
+        }
     }
 
     private fun setupEdgeToEdge() {

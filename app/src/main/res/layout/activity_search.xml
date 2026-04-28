@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="@color/white">
-
-    <!-- ── TOP BAR ─────────────────────────────────────────── -->
+    <!--  ── TOP BAR ───────────────────────────────────────────  -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -19,14 +18,13 @@
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="@drawable/bg_circle_outline"
-            android:scaleType="centerCrop"
             android:src="@drawable/arrow"
+            android:scaleType="centerCrop"
             android:contentDescription="Back" />
-
-        <!-- Search Input -->
+        <!--  Search Input  -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -36,13 +34,14 @@
             android:background="@drawable/bg_input_field"
             android:gravity="center_vertical"
             android:paddingStart="12dp"
-            android:paddingEnd="10dp"
+            android:paddingEnd="8dp"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:src="@drawable/search"
+                android:scaleType="centerCrop"
                 android:contentDescription="Search"
                 app:tint="@color/text_secondary" />
 
@@ -59,21 +58,20 @@
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:singleLine="true" />
-
-            <!-- Clear X button (visible when typing) -->
+            <!--  Clear X — visible only when text is not empty  -->
             <ImageButton
-                android:id="@+id/btnClear"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:background="@null"
+                android:id="@+id/btnClearText"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Clear text"
                 android:src="@drawable/close"
-                android:contentDescription="Clear"
+                android:scaleType="centerCrop"
                 android:visibility="gone"
+
                 app:tint="@color/text_secondary" />
-
         </LinearLayout>
-
-        <!-- Filter button -->
+        <!--  Filter button  -->
         <LinearLayout
             android:id="@+id/btnFilter"
             android:layout_width="38dp"
@@ -87,7 +85,6 @@
                 android:src="@drawable/filter"
                 android:contentDescription="Filter"
                 app:tint="@color/primary" />
-
         </LinearLayout>
 
         <TextView
@@ -99,23 +96,20 @@
             android:textSize="13sp"
             android:textColor="@color/primary"
             android:padding="4dp" />
-
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/divider" />
-
-    <!-- ── LOADING BAR ───────────────────────────────────────── -->
+    <!--  ── LOADING ──────────────────────────────────────────────  -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:visibility="gone" />
-
-    <!-- ── RESULT COUNT (shown during search) ───────────────── -->
+    <!--  ── RESULT COUNT ────────────────────────────────────────  -->
     <TextView
         android:id="@+id/tvResultCount"
         android:layout_width="match_parent"
@@ -127,8 +121,7 @@
         android:textSize="12sp"
         android:textColor="@color/text_secondary"
         android:visibility="gone" />
-
-    <!-- ── EMPTY STATE ───────────────────────────────────────── -->
+    <!--  ── EMPTY STATE ─────────────────────────────────────────  -->
     <LinearLayout
         android:id="@+id/layoutEmpty"
         android:layout_width="match_parent"
@@ -152,12 +145,10 @@
             android:textSize="14sp"
             android:textColor="@color/text_secondary"
             android:layout_marginTop="8dp" />
-
     </LinearLayout>
-
-    <!-- ════════════════════════════════════════════════════════
-         RECENT + POPULAR (shown when search bar is empty)
-         ════════════════════════════════════════════════════════ -->
+    <!--  ════════════════════════════════════════════════════════
+             RECENT + CATEGORIES (shown when search bar is empty)
+             ════════════════════════════════════════════════════════  -->
     <ScrollView
         android:id="@+id/layoutRecent"
         android:layout_width="match_parent"
@@ -171,163 +162,62 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="14dp"
-            android:paddingBottom="20dp">
-
-            <!-- Recent Searches label -->
-            <TextView
+            android:paddingBottom="30dp">
+            <!--  Recent Searches header row  -->
+            <LinearLayout
+                android:id="@+id/layoutRecentHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recent Searches"
-                android:textSize="11sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:textStyle="bold"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0.05"
+                    android:text="Recent Searches"
+                    android:textAllCaps="true"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+                <!--  Clear All button  -->
+                <TextView
+                    android:id="@+id/tvClearHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="Clear All"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+            <!--  ✅ Dynamic history list (replaces hardcoded items)  -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSearchHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem=""
+                android:nestedScrollingEnabled="false" />
+            <!--  Empty history label  -->
+            <TextView
+                android:id="@+id/tvNoHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="No recent searches"
                 android:textColor="@color/text_secondary"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Recent item 1 -->
-            <LinearLayout
-                android:id="@+id/recentItem1"
+                android:textSize="12sp"
+                android:visibility="gone" />
+            <!--  Divider  -->
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/history"
-                    android:contentDescription="Recent"
-                    android:layout_marginEnd="12dp"
-                   />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="House Cleaning"
-                    android:textSize="13sp"
-                    android:textColor="@color/text_primary" />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/close"
-                    android:contentDescription="Remove"
-                    app:tint="@color/text_secondary" />
-
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="@color/divider" />
-
-            <!-- Recent item 2 -->
-            <LinearLayout
-                android:id="@+id/recentItem2"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/history"
-                    android:contentDescription="Recent"
-                    android:layout_marginEnd="12dp"
-                    />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Plumbing"
-                    android:textSize="13sp"
-                    android:textColor="@color/text_primary" />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/close"
-                    android:contentDescription="Remove"
-                    app:tint="@color/text_secondary" />
-
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="@color/divider" />
-
-            <!-- Recent item 3 -->
-            <LinearLayout
-                android:id="@+id/recentItem3"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/history"
-                    android:contentDescription="Recent"
-                    android:layout_marginEnd="12dp"
-                    app:tint="@color/text_secondary" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Electrician"
-                    android:textSize="13sp"
-                    android:textColor="@color/text_primary" />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/close"
-                    android:contentDescription="Remove"
-                    app:tint="@color/text_secondary" />
-
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="@color/divider" />
-
-            <!-- Recent item 4 -->
-            <LinearLayout
-                android:id="@+id/recentItem4"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/history"
-                    android:contentDescription="Recent"
-                    android:layout_marginEnd="12dp"
-                    app:tint="@color/text_secondary" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Carpentry"
-                    android:textSize="13sp"
-                   />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/close"
-                    android:contentDescription="Remove"
-                 />
-
-            </LinearLayout>
-
-            <!-- Popular Categories label -->
+                android:layout_height="0.5dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/divider" />
+            <!--  Popular Categories label  -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -337,17 +227,14 @@
                 android:letterSpacing="0.05"
                 android:textStyle="bold"
                 android:textColor="@color/text_secondary"
-                android:layout_marginTop="20dp"
                 android:layout_marginBottom="12dp" />
-
-            <!-- Category grid row 1 -->
+            <!--  Category Grid Row 1  -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="12dp">
 
-                <!-- Cleaning -->
                 <LinearLayout
                     android:id="@+id/catCleaning"
                     android:layout_width="0dp"
@@ -362,6 +249,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -376,10 +264,8 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
 
-                <!-- Plumbing -->
                 <LinearLayout
                     android:id="@+id/catPlumbing"
                     android:layout_width="0dp"
@@ -394,6 +280,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -408,10 +295,8 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
 
-                <!-- Electrician -->
                 <LinearLayout
                     android:id="@+id/catElectrician"
                     android:layout_width="0dp"
@@ -426,6 +311,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -440,10 +326,8 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
 
-                <!-- Carpentry -->
                 <LinearLayout
                     android:id="@+id/catCarpentry"
                     android:layout_width="0dp"
@@ -458,6 +342,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -472,18 +357,14 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
-
             </LinearLayout>
-
-            <!-- Category grid row 2 -->
+            <!--  Category Grid Row 2  -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- AC Repair -->
                 <LinearLayout
                     android:id="@+id/catAcRepair"
                     android:layout_width="0dp"
@@ -498,6 +379,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -512,10 +394,8 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
 
-                <!-- Gardening -->
                 <LinearLayout
                     android:id="@+id/catGardening"
                     android:layout_width="0dp"
@@ -530,6 +410,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -544,10 +425,8 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
 
-                <!-- Painting -->
                 <LinearLayout
                     android:id="@+id/catPainting"
                     android:layout_width="0dp"
@@ -562,6 +441,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -576,10 +456,8 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
 
-                <!-- More -->
                 <LinearLayout
                     android:id="@+id/catMore"
                     android:layout_width="0dp"
@@ -594,6 +472,7 @@
                         android:layout_height="52dp"
                         android:gravity="center"
                         android:background="@drawable/bg_category_icon">
+
                         <ImageView
                             android:layout_width="26dp"
                             android:layout_height="26dp"
@@ -608,17 +487,13 @@
                         android:textSize="10sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginTop="5dp" />
-
                 </LinearLayout>
-
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
-
-    <!-- ════════════════════════════════════════════════════════
-         SEARCH RESULTS (shown when typing)
-         ════════════════════════════════════════════════════════ -->
+    <!--  ════════════════════════════════════════════════════════
+             SEARCH RESULTS (shown when typing)
+             ════════════════════════════════════════════════════════  -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvResults"
         android:layout_width="match_parent"
@@ -629,5 +504,4 @@
         android:paddingBottom="20dp"
         android:clipToPadding="false"
         android:visibility="gone" />
-
 </LinearLayout>

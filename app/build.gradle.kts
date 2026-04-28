@@ -61,6 +61,7 @@ dependencies {
 
     // Glide for image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.androidx.ui)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // UI & Lifecycle
