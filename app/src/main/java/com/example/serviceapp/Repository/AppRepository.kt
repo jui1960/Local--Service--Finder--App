@@ -118,20 +118,32 @@ class AppRepository {
         uploadedImageUrls: List<String>
     ): ServicePost {
         val user = auth.currentUser
-        val uid  = user?.uid ?: ""
+        val uid = user?.uid ?: ""
+        val email = user?.email ?: ""
+
+        // 🔥 সমাধান: Firestore থেকে ইউজারের প্রোফাইল আগে নিয়ে আসা
+        val userProfile = getUserProfile(uid)
+
+        // প্রোফাইলে যদি নাম না থাকে তবে ডিসপ্লে নাম, নাহলে "Unknown"
+        val finalName = userProfile?.fullName ?: (user?.displayName ?: "Unknown")
+
+        // প্রোফাইলে যদি ফোন না থাকে তবে Auth-এর ফোন, নাহলে খালি
+        // মনে রাখবেন, UserProfile মডেলে phone ফিল্ডটি থাকতে হবে
+        val finalPhone = userProfile?.phone ?: (user?.phoneNumber ?: "")
 
         val newPost = ServicePost(
             title            = title,
-            providerName     = user?.displayName ?: "Unknown",
-            providerUsername = "@${user?.displayName?.lowercase()?.replace(" ", "") ?: "user"}",
+            providerName     = finalName,
+            providerUsername = "@${finalName.lowercase().replace(" ", "")}",
             rating           = 0f,
             reviewCount      = 0,
             price            = price,
+            providerEmail    = email,
             imageRes         = 0,
             isOffering       = isOffering,
             description      = description,
             location         = location,
-            phone            = user?.phoneNumber ?: "",
+            phone            = finalPhone, // 🔥 এখানে এখন সঠিক ফোন বসবে
             skills           = listOf(category),
             isBookmarked     = false,
             imageUrls        = uploadedImageUrls,
@@ -146,7 +158,7 @@ class AppRepository {
 
 
     // Registration logic
-    suspend fun signUpWithEmail(email: String, pass: String, fullName: String): Boolean {
+    suspend fun signUpWithEmail(email: String, pass: String, fullName: String,phone: String): Boolean {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, pass).await()
             val uid = result.user?.uid
@@ -156,6 +168,7 @@ class AppRepository {
                     uid = uid,
                     fullName = fullName,
                     email = email,
+                    phone = phone,
                     createdAt = System.currentTimeMillis()
                 )
                 usersCollection.document(uid).set(initialProfile).await()

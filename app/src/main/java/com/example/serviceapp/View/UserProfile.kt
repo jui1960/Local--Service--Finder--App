@@ -2,6 +2,7 @@ package com.example.serviceapp.View
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.example.serviceapp.ViewModel.ProfileViewModel
 import com.example.serviceapp.databinding.ActivityUserProfileBinding
@@ -35,7 +37,6 @@ class UserProfile : AppCompatActivity() {
     }
 
     private fun setupEdgeToEdge() {
-        // Status/Nav bar icon color dark kora (Light theme-er jonno)
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.isAppearanceLightStatusBars = true
         windowInsetsController.isAppearanceLightNavigationBars = true
@@ -43,22 +44,21 @@ class UserProfile : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            // 🟢 Top Bar Padding (Status Bar height adjust)
-            // XML-e apnar id holo 'topBarBg', tai ekhane 'topBarBg' use korte hobe
-            binding.topBarBg.setPadding(
-                binding.topBarBg.paddingLeft,
-                systemBars.top, // Status bar height
-                binding.topBarBg.paddingRight,
-                binding.topBarBg.paddingBottom
-            )
+            // 🟢 Fix Top Bar: Increase total height (56dp + status bar)
+            binding.topBarBg.updateLayoutParams {
+                val baseHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56f, resources.displayMetrics).toInt()
+                height = baseHeight + systemBars.top
+            }
+            // Move content down within the bar
+            binding.topBarBg.setPadding(0, systemBars.top, 0, 0)
 
-            // 🔴 Bottom Nav Padding (System Nav height adjust)
-            binding.bottomNav.setPadding(
-                binding.bottomNav.paddingLeft,
-                binding.bottomNav.paddingTop,
-                binding.bottomNav.paddingRight,
-                systemBars.bottom // Navigation bar height
-            )
+            // 🔴 Fix Bottom Nav: Increase total height (58dp + nav bar)
+            binding.bottomNav.updateLayoutParams {
+                val baseHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 58f, resources.displayMetrics).toInt()
+                height = baseHeight + systemBars.bottom
+            }
+            // Move icons up within the bar
+            binding.bottomNav.setPadding(0, 0, 0, systemBars.bottom)
 
             insets
         }
@@ -105,6 +105,13 @@ class UserProfile : AppCompatActivity() {
         binding.tabPost.setOnClickListener {
             startActivity(Intent(this, PostServiceScreen::class.java))
         }
+        binding.tabExplore.setOnClickListener {
+            val intent = Intent(this, Search::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+
+        }
+
 
         binding.tabChats.setOnClickListener {
             Toast.makeText(this, "Chats coming soon", Toast.LENGTH_SHORT).show()
@@ -132,6 +139,12 @@ class UserProfile : AppCompatActivity() {
                 chip.setChipBackgroundColorResource(com.example.serviceapp.R.color.chip_bg)
                 chip.setTextColor(getColor(com.example.serviceapp.R.color.primary))
                 binding.chipGroupSkills.addView(chip)
+            }
+            viewModel.userPosts.observe(this) { posts ->
+                if (posts != null) {
+                    // ডাটাবেসে যতগুলো পোস্ট আছে তার সংখ্যা এখানে বসবে
+                    binding.tvPostCount.text = posts.size.toString()
+                }
             }
 
             if (user.profileImageUrl.isNotBlank()) {

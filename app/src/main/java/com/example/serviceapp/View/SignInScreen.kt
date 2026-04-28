@@ -34,7 +34,8 @@ class SignInScreen : AppCompatActivity() {
                 val email = binding.etEmail.text.toString().trim()
                 val password = binding.etPassword.text.toString().trim()
                 val name = binding.etFullName.text.toString().trim()
-                authViewModel.registerUser(email, password, name)
+                val phone = binding.etPhone.text.toString().trim()
+                authViewModel.registerUser(email, password, name,phone)
             }
         }
     }

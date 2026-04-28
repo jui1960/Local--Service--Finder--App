@@ -21,7 +21,7 @@
                 android:layout_width="0dp"
                 android:layout_height="300dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img3"
+
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -44,6 +44,7 @@
                 android:padding="8dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/back"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/black" />
@@ -64,21 +65,20 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="centerInside"
                     android:src="@drawable/share"
-
                     app:tint="@color/black" />
 
                 <ImageButton
                     android:id="@+id/ivBookmark"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="centerInside"
                     android:src="@drawable/bookmark2"
-
                     app:tint="@color/primary" />
             </LinearLayout>
-
 
             <TextView
                 android:id="@+id/tvBadge"
@@ -156,14 +156,17 @@
                 app:layout_constraintTop_toTopOf="@+id/ivProviderProfile"
                 tools:text="John Doe" />
 
+
             <TextView
-                android:id="@+id/tvProviderUsername"
+                android:id="@+id/tvProviderEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="#757575"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@+id/tvProviderName"
                 app:layout_constraintTop_toBottomOf="@+id/tvProviderName"
-                tools:text="(@john_cleaner)" />
+                tools:text="john.doe@example.com" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

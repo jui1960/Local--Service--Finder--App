@@ -32,11 +32,11 @@ class AuthViewModel : ViewModel() {
         }, 1000)
     }
 
-    fun registerUser(email: String, pass: String, fullName: String) {
+    fun registerUser(email: String, pass: String, fullName: String,phone: String) {
         _isProcessing.value = true
         viewModelScope.launch {
             try {
-                val success = repository.signUpWithEmail(email, pass, fullName)
+                val success = repository.signUpWithEmail(email, pass, fullName, phone)
                 _authSuccess.value = success
             } catch (e: Exception) {
                 _errorMessage.value = e.localizedMessage

@@ -8,6 +8,7 @@ data class ServicePost(
     val title: String = "",
     val providerName: String = "",
     val providerUsername: String = "",
+    val providerEmail: String = "",
     val rating: Float = 0f,
     val reviewCount: Int = 0,
     val price: Int = 0,

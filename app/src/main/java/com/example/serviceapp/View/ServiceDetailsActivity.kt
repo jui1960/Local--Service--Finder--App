@@ -46,10 +46,28 @@ class ServiceDetailsActivity : AppCompatActivity() {
             if (service == null) return@observe
 
             binding.apply {
-                // Image
+                // ১. ইমেজ লোডিং
                 ivServiceImage.setImageResource(service.imageRes)
 
-                // Badge (Offering / Looking)
+                // ২. প্রোভাইডার নাম ও ইমেল লজিক
+                val name = service.providerName
+                tvProviderName.text = if (name == "Unknown" || name.isEmpty()) {
+                    service.providerEmail.substringBefore("@").replaceFirstChar { it.uppercase() }
+                } else {
+                    name
+                }
+                tvProviderEmail.text = service.providerEmail
+
+                // ৩. ফোন নাম্বার লজিক (নিশ্চিত করুন এই অংশটি ঠিক আছে)
+                if (!service.phone.isNullOrEmpty()) {
+                    tvPhone.text = service.phone
+                    phoneContainer.visibility = android.view.View.VISIBLE
+                } else {
+                    tvPhone.text = "Not Available"
+                    // phoneContainer.visibility = android.view.View.GONE
+                }
+
+                // ৪. ব্যাজ সেটআপ
                 if (service.isOffering) {
                     tvBadge.text = "Offering Service"
                     tvBadge.setBackgroundResource(R.drawable.bg_badge_offering)
@@ -60,52 +78,35 @@ class ServiceDetailsActivity : AppCompatActivity() {
                     tvBadge.setTextColor(ContextCompat.getColor(this@ServiceDetailsActivity, R.color.badge_looking_text))
                 }
 
-                // Title
+                // ৫. অন্যান্য তথ্য
                 tvServiceTitle.text = service.title
-
-                // Provider info
-                tvProviderName.text = service.providerName
-                tvProviderUsername.text = service.providerUsername
                 tvRating.text = service.rating.toString()
                 tvReviewCount.text = "(${service.reviewCount} reviews)"
-
-                // Price
                 tvPrice.text = "৳ ${service.price}"
-
-                // Description
                 tvDescription.text = service.description
-
-                // Location
                 tvLocation.text = service.location
 
-                // Phone
-                tvPhone.text = service.phone
-
-                // Skills chips — dynamically add chips
+                // ৬. স্কিল চিপস
                 chipGroupSkills.removeAllViews()
                 service.skills.forEach { skill ->
-                    val chip = layoutInflater.inflate(
-                        R.layout.item_skill_chip, chipGroupSkills, false
-                    )
-                    // If using Material Chip:
-                    // val chip = Chip(this@ServiceDetailsActivity)
-                    // chip.text = skill
-                    // chip.isCheckable = false
+                    val chip = layoutInflater.inflate(R.layout.item_skill_chip, chipGroupSkills, false)
+                    // chip.findViewById<TextView>(R.id.tvSkillTag).text = skill
                     chipGroupSkills.addView(chip)
                 }
             }
         }
 
-        // Observe bookmark toggle
+        // ৭. বুকমার্ক এবং ৮. টোস্ট অবজার্ভার আগের মতোই থাকবে...
         viewModel.isBookmarked.observe(this) { bookmarked ->
             binding.ivBookmark.setImageResource(
                 if (bookmarked) R.drawable.bookmark else R.drawable.bookmark2
             )
         }
 
-        // Observe toast messages
         viewModel.toastMessage.observe(this) { msg ->
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            if (!msg.isNullOrEmpty()) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
