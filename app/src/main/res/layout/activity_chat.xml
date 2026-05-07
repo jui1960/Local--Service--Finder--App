@@ -26,11 +26,12 @@
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_height="19dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/arrow"
+            android:contentDescription="Back"
+           android:layout_marginHorizontal="10dp"
             android:scaleType="centerCrop"
-            android:contentDescription="Back" />
+            android:src="@drawable/arrow" />
 
         <!-- Avatar circle -->
         <TextView
@@ -95,7 +96,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/call"
             android:scaleType="centerCrop"
-
+            android:layout_marginEnd="10.dp"
             android:contentDescription="Call" />
 
         <!-- More options -->
@@ -144,6 +145,8 @@
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Attach"
+            android:src="@drawable/voice"
+            android:scaleType="centerCrop"
             android:layout_marginEnd="8dp" />
 
         <!-- Input field -->
