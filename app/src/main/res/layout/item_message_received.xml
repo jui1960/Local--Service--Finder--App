@@ -33,11 +33,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_bubble_received"
-            android:paddingStart="14dp"
+            android:paddingStart="13dp"
             android:paddingEnd="14dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:text="Hey! Are you free this weekend?"
+            android:text="Hey!! Are you free this weekend?"
             android:textColor="@color/black"
             android:textSize="13sp"
             android:lineSpacingMultiplier="1.4" />
@@ -50,7 +50,7 @@
             android:layout_marginStart="4dp"
             android:text="10:28 AM"
             android:textColor="#AAAAAA"
-            android:textSize="10sp" />
+            android:textSize="11sp" />
 
     </LinearLayout>
 
