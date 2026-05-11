@@ -13,7 +13,6 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="12dp">
-        <!--  Service Image  -->
         <androidx.cardview.widget.CardView
             android:layout_width="70dp"
             android:layout_height="70dp"
@@ -27,14 +26,12 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/img" />
         </androidx.cardview.widget.CardView>
-        <!--  Info Section  -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
-            <!--  Badge: Offering / Looking  -->
             <TextView
                 android:id="@+id/tvBadge"
                 android:layout_width="wrap_content"
@@ -47,7 +44,6 @@
                 android:text="Offering Service"
                 android:textColor="@color/badge_offering_text"
                 android:textSize="10sp" />
-            <!--  Title  -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
