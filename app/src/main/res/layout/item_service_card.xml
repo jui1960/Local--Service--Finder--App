@@ -55,7 +55,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
-            <!--  Provider Name  -->
             <TextView
                 android:id="@+id/tvProviderName"
                 android:layout_width="wrap_content"
@@ -64,7 +63,6 @@
                 android:text="John Doe"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp" />
-            <!--  Rating Row  -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -96,7 +94,6 @@
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
-        <!--  Right Section: Price + Bookmark  -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
