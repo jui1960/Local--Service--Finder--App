@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <!--  ── TOP BAR ───────────────────────────────────────  -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -39,18 +38,15 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
-        <!--  ── DIVIDER ────────────────────────────────────────  -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/divider" />
-        <!--  ── BODY ───────────────────────────────────────────  -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-            <!--  Label  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,7 +54,6 @@
                 android:text="I want to"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
-            <!--  ── OFFER / NEED TOGGLE ─────────────────────────  -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
@@ -88,7 +83,6 @@
                     android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
-            <!--  ── SERVICE TITLE ──────────────────────────────  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -108,7 +102,6 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:textSize="13sp" />
-            <!--  ── CATEGORY ────────────────────────────────────  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -125,7 +118,6 @@
                 android:background="@drawable/bg_input_field"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp" />
-            <!--  ── DESCRIPTION ─────────────────────────────────  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -147,7 +139,6 @@
                 android:paddingTop="12dp"
                 android:paddingEnd="14dp"
                 android:textSize="13sp" />
-            <!--  ── PRICE ───────────────────────────────────────  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -167,7 +158,6 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:textSize="13sp" />
-            <!--  ── LOCATION ────────────────────────────────────  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -187,7 +177,6 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:textSize="13sp" />
-            <!--  ── ADD PHOTOS ───────────────────────────────────  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -195,7 +184,6 @@
                 android:text="Add Photos"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
-            <!--  Photo thumbnails RecyclerView (hidden when empty)  -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPhotos"
                 android:layout_width="match_parent"
@@ -204,7 +192,6 @@
                 android:orientation="horizontal"
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-            <!--  Add Photo Button  -->
             <LinearLayout
                 android:id="@+id/btnAddPhoto"
                 android:layout_width="match_parent"
@@ -229,7 +216,6 @@
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
-            <!--  ── PROGRESS BAR ────────────────────────────────  -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
@@ -237,7 +223,6 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone" />
-            <!--  ── POST NOW BUTTON ─────────────────────────────  -->
             <Button
                 android:id="@+id/btnPostNow"
                 android:layout_width="match_parent"
