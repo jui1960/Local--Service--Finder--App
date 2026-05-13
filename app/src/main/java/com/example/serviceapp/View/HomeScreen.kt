@@ -173,7 +173,7 @@ class HomeScreen : AppCompatActivity() {
         }
 
         binding.tabChats.setOnClickListener {
-            Toast.makeText(this, "Chats coming soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, ChatList::class.java))
         }
 
         binding.tabProfile.setOnClickListener {

@@ -34,3 +34,17 @@ data class Category(
 enum class SearchSortOrder {
     NEWEST, POPULAR, PRICE_LOW, PRICE_HIGH
 }
+
+data class ChatMessage(
+    val message: String,
+    val time: String,
+    val isSentByMe: Boolean // true হলে Sent Layout, false হলে Received Layout
+)
+
+data class ChatUser(
+    val name        : String,
+    val initials    : String,
+    val lastMessage : String,
+    val time        : String,
+    val unreadCount : Int = 0
+)

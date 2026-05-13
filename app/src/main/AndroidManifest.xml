@@ -14,11 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ServiceApp">
         <activity
+            android:name=".View.ChatList"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".View.Chat"
             android:exported="false" />
         <activity
             android:name=".View.FilterBottomSheet"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".View.Search"
             android:exported="false" />
