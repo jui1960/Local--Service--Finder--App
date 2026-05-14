@@ -56,35 +56,35 @@ class PostServiceViewModel : ViewModel() {
         _photoUris.value = list
     }
 
+    // PostServiceViewModel.kt-er submitPost() function-ti update korun
     fun submitPost() {
-        val t = title.value.orEmpty()
-        val c = category.value.orEmpty()
-        val d = description.value.orEmpty()
-        val p = price.value.orEmpty()
-        val l = location.value.orEmpty()
+        val t: String = title.value.orEmpty()
+        val c: String = category.value.orEmpty()
+        val d: String = description.value.orEmpty()
+        val p: String = price.value.orEmpty()
+        val l: String = location.value.orEmpty()
 
-        // 1. Validation
-        val error = repository.validatePost(t, c, d, p, l)
+        // 1. Validation (Ekhon error reference thik hobe)
+        val error: String? = repository.validatePost(t, c, d, p, l)
         if (error != null) {
             _validationError.value = error
             return
         }
 
-        // 2. Start Loading
         _postResult.value = PostResult.Loading
 
-        // 3. Launch Coroutine for Network/Firebase tasks
         viewModelScope.launch {
             try {
-                // Step A: Image gulo Firebase Storage-e upload kora
                 val currentUris = _photoUris.value ?: emptyList()
-                val uploadedUrls = if (currentUris.isNotEmpty()) {
+
+                // 2. Upload Images
+                val uploadedUrls: List<String> = if (currentUris.isNotEmpty()) {
                     repository.uploadImages(currentUris)
                 } else {
                     emptyList()
                 }
 
-                // Step B: Firebase theke pawa URL diye post submit kora
+                // 3. Submit Post to Firestore
                 val newPost = repository.submitPost(
                     title = t,
                     category = c,
@@ -92,16 +92,15 @@ class PostServiceViewModel : ViewModel() {
                     price = p.toInt(),
                     location = l,
                     isOffering = isOffering.value ?: true,
-                    uploadedImageUrls = uploadedUrls // Pass the remote URLs
+                    uploadedImageUrls = uploadedUrls
                 )
 
                 _postResult.value = PostResult.Success(newPost)
             } catch (e: Exception) {
-                _postResult.value = PostResult.Error(e.message ?: "Something went wrong")
+                _postResult.value = PostResult.Error(e.message ?: "Submission failed")
             }
         }
     }
-
     fun clearError() {
         _validationError.value = null
     }

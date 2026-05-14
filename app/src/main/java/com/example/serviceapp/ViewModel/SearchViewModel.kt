@@ -53,11 +53,11 @@ class SearchViewModel() : ViewModel() {
             maxPrice = filterMaxPrice.value,
             isOffering = filterOffering.value,
             sortBy = sortOrder.value ?: SearchSortOrder.NEWEST,
-            onUpdate = { posts ->
+            onUpdate = { posts: List<ServicePost> ->
                 _isLoading.value = false
                 _results.value = posts
             },
-            onError = { e ->
+            onError = { e: Exception ->
                 _isLoading.value = false
                 _errorMessage.value = e.message
             }

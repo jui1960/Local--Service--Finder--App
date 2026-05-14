@@ -36,15 +36,18 @@ enum class SearchSortOrder {
 }
 
 data class ChatMessage(
-    val message: String,
-    val time: String,
-    val isSentByMe: Boolean // true হলে Sent Layout, false হলে Received Layout
+    val message    : String  = "",
+    val senderId   : String  = "",
+    val time       : Long    = 0L,   // ← String থেকে Long করো
+    val isSentByMe : Boolean = false
 )
 
 data class ChatUser(
-    val name        : String,
-    val initials    : String,
-    val lastMessage : String,
-    val time        : String,
-    val unreadCount : Int = 0
+    val chatId: String = "",
+    val otherUserId: String = "",
+    val name: String = "",
+    val initials: String = "",
+    val lastMessage: String = "",
+    val time: String = "",
+    val unreadCount: Int = 0
 )

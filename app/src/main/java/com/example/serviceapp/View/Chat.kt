@@ -5,87 +5,85 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.serviceapp.Adapter.ChatAdapter
 import com.example.serviceapp.Model.ChatMessage
+import com.example.serviceapp.Repository.AppRepository
 import com.example.serviceapp.databinding.ActivityChatBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.google.firebase.auth.FirebaseAuth
 
 class Chat : AppCompatActivity() {
 
     private lateinit var binding     : ActivityChatBinding
     private lateinit var chatAdapter : ChatAdapter
     private val messageList          = mutableListOf<ChatMessage>()
+    private val repository           = AppRepository()
+
+    private lateinit var chatId      : String
+    private lateinit var otherUserId : String
+    private lateinit var otherUserName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Intent থেকে user data নেওয়া
-        val userName     = intent.getStringExtra("userName")     ?: "User"
-        val userInitials = intent.getStringExtra("userInitials") ?: "?"
+        chatId        = intent.getStringExtra("CHAT_ID") ?: ""
+        otherUserId   = intent.getStringExtra("OTHER_USER_ID") ?: ""
+        otherUserName = intent.getStringExtra("OTHER_USER_NAME") ?: "User"
 
-        // Toolbar-এ set করা
-        binding.tvChatUserName.text   = userName
-        binding.tvAvatarInitials.text = userInitials
+        // UI Setup
+        binding.tvChatUserName.text   = otherUserName
+        binding.tvAvatarInitials.text = otherUserName.take(1).uppercase()
 
         setupRecyclerView()
         setupSendButton()
         setupToolbar()
-        loadDummyMessages()
+        loadMessages()
     }
 
-    private fun setupToolbar() {
-        binding.btnBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-        binding.btnCall.setOnClickListener { }
-        binding.btnMore.setOnClickListener { }
-    }
+    private fun loadMessages() {
+        if (chatId.isEmpty()) return
 
-    private fun setupRecyclerView() {
-        chatAdapter = ChatAdapter(messageList)
+        val myUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        binding.rvChatMessages.apply {
-            adapter       = chatAdapter
-            layoutManager = LinearLayoutManager(this@Chat).also {
-                it.stackFromEnd = true
+        repository.getMessages(chatId) { messages ->
+            runOnUiThread {
+                // message model-e isSentByMe logic-ti ekhane set kore nite hobe
+                val updatedMessages = messages.map { msg ->
+                    msg.copy(isSentByMe = msg.senderId == myUid)
+                }
+
+                messageList.clear()
+                messageList.addAll(updatedMessages)
+                chatAdapter.notifyDataSetChanged()
+
+                if (messageList.isNotEmpty()) {
+                    binding.rvChatMessages.scrollToPosition(messageList.size - 1)
+                }
             }
         }
     }
-
     private fun setupSendButton() {
         binding.btnSend.setOnClickListener {
             val text = binding.etMessage.text.toString().trim()
             if (text.isEmpty()) return@setOnClickListener
 
-            val newMessage = ChatMessage(
-                message    = text,
-                time       = getCurrentTime(),
-                isSentByMe = true
-            )
-            messageList.add(newMessage)
-            chatAdapter.notifyItemInserted(messageList.size - 1)
-            binding.rvChatMessages.scrollToPosition(messageList.size - 1)
             binding.etMessage.text?.clear()
+
+
+            repository.sendMessage(chatId, text, otherUserId, otherUserName)
         }
     }
 
-    private fun loadDummyMessages() {
-        messageList.addAll(
-            listOf(
-                ChatMessage("Hey! Are you free this weekend? 👋", "10:28 AM", false),
-                ChatMessage("Yeah, totally free on Saturday!",     "10:30 AM", true),
-                ChatMessage("Maybe a hike then coffee after? ☕",  "10:31 AM", false),
-                ChatMessage("That sounds perfect 🙌",              "10:32 AM", true),
-            )
-        )
-        chatAdapter.notifyDataSetChanged()
-        binding.rvChatMessages.scrollToPosition(messageList.size - 1)
+    private fun setupRecyclerView() {
+        chatAdapter = ChatAdapter(messageList)
+        binding.rvChatMessages.apply {
+            adapter       = chatAdapter
+            layoutManager = LinearLayoutManager(this@Chat).apply {
+                stackFromEnd = true
+            }
+        }
     }
 
-    private fun getCurrentTime(): String {
-        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        return sdf.format(Date())
+    private fun setupToolbar() {
+        binding.btnBack.setOnClickListener { finish() }
     }
 }

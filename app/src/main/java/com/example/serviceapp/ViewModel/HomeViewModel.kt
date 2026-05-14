@@ -41,23 +41,21 @@ class HomeViewModel : ViewModel() {
     // ── Realtime Firestore listener ───────────────────────────
     // Every time a new post is added/updated/deleted in Firestore,
     // this automatically updates the Home Screen — no manual refresh!
+// HomeViewModel.kt-er startListeningToServices function-ti erom hobe:
     private fun startListeningToServices() {
         _isLoading.value = true
 
         servicesListener = repository.listenToServices(
-            onUpdate = { posts ->
+            onUpdate = { posts: List<ServicePost> -> // Explicit type add kora hoyeche
                 _isLoading.value = false
                 _services.value = posts
             },
-            onError = { exception ->
+            onError = { exception: Exception -> // Explicit type add kora hoyeche
                 _isLoading.value = false
-                _errorMessage.value = "Failed to load services: ${exception.message}"
+                _errorMessage.value = "Failed to load services: ${exception.message}" // 'message' ekhon pawa jabe
             }
         )
-
-
     }
-
 
 
     // Call this to manually retry after an error

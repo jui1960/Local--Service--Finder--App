@@ -53,10 +53,10 @@ class ProfileViewModel : ViewModel() {
         postsListener?.remove()
         postsListener = repository.listenToUserPosts(
             uid = uid,
-            onUpdate = { posts ->
+            onUpdate = { posts: List<ServicePost> ->
                 _userPosts.value = posts
             },
-            onError = { e ->
+            onError = { e: Exception ->
                 _errorMessage.value = e.message
             }
         )

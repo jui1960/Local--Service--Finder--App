@@ -7,6 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.serviceapp.Model.ChatMessage
 import com.example.serviceapp.R
+import com.example.serviceapp.View.Chat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ChatAdapter(private val messageList: List<ChatMessage>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -14,6 +18,12 @@ class ChatAdapter(private val messageList: List<ChatMessage>) :
     companion object {
         private const val TYPE_SENT     = 1
         private const val TYPE_RECEIVED = 2
+    }
+
+    // Long → "10:30 AM" format
+    private fun formatTime(timeMillis: Long): String {
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return sdf.format(Date(timeMillis))
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -37,14 +47,14 @@ class ChatAdapter(private val messageList: List<ChatMessage>) :
 
         if (holder is SentViewHolder) {
             holder.tvMessage.text = chatMessage.message
-            holder.tvTime.text    = chatMessage.time
+            holder.tvTime.text    = formatTime(chatMessage.time)
         } else if (holder is ReceivedViewHolder) {
             holder.tvMessage.text  = chatMessage.message
-            holder.tvTime.text     = chatMessage.time
-            holder.tvInitials.text = "JD"
+            holder.tvTime.text     = formatTime(chatMessage.time)
+            // Intent theke pawa name theke initials boshano
+            holder.tvInitials.text = (holder.itemView.context as? Chat)?.intent?.getStringExtra("OTHER_USER_NAME")?.take(1)?.uppercase() ?: "?"
         }
     }
-
     override fun getItemCount() = messageList.size
 
     class SentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -23,6 +23,10 @@ class ServiceDetailViewModel : ViewModel() {
     private val _toastMessage = MutableLiveData<String?>()
     val toastMessage: LiveData<String?> = _toastMessage
 
+    // ✅ চ্যাট আইডি অবজার্ভ করার জন্য নতুন লাইভ ডাটা
+    private val _chatIdResult = MutableLiveData<String?>()
+    val chatIdResult: LiveData<String?> = _chatIdResult
+
     // Load service data by ID
     fun loadService(serviceId: String) {
         viewModelScope.launch {
@@ -30,7 +34,6 @@ class ServiceDetailViewModel : ViewModel() {
                 val service = repository.getServiceById(serviceId)
                 _serviceDetail.value = service
 
-                // Realtime check: User-er bookmark list-e ei ID-ti ache kina
                 val uid = auth.currentUser?.uid
                 if (uid != null) {
                     val bookmarks = repository.getBookmarkedIds(uid)
@@ -48,10 +51,8 @@ class ServiceDetailViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Repository-r toggleBookmark call kora
                 val newState = repository.toggleBookmark(serviceId, currentStatus)
                 _isBookmarked.value = newState
-
                 _toastMessage.value = if (newState) "Added to bookmarks" else "Removed from bookmarks"
             } catch (e: Exception) {
                 _toastMessage.value = "Failed to update bookmark"
@@ -59,8 +60,16 @@ class ServiceDetailViewModel : ViewModel() {
         }
     }
 
-    fun onMessageClick() {
-        _toastMessage.value = "Opening chat..."
+    // ✅ চ্যাট বাটন ক্লিক করলে ইউনিক আইডি জেনারেট করার লজিক
+    fun onMessageClick(providerId: String, providerName: String) {
+        repository.getOrCreateChatId(providerId, providerName) { chatId ->
+            _chatIdResult.postValue(chatId)
+        }
+    }
+
+    // চ্যাট আইডি রিসেট করার ফাংশন (যাতে বারবার নেভিগেট না হয়)
+    fun resetChatId() {
+        _chatIdResult.value = null
     }
 
     fun clearToast() { _toastMessage.value = null }

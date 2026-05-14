@@ -13,7 +13,14 @@ class ChatListAdapter(
     private val onClick: (ChatUser) -> Unit
 ) : RecyclerView.Adapter<ChatListAdapter.UserViewHolder>() {
 
+    // Filter korar jonno original data-r copy
     private var originalList = userList.toList()
+
+    fun updateData(newList: List<ChatUser>) {
+        this.userList = newList
+        this.originalList = newList.toList()
+        notifyDataSetChanged()
+    }
 
     inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvInitials    : TextView = itemView.findViewById(R.id.tvInitials)
@@ -32,11 +39,21 @@ class ChatListAdapter(
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = userList[position]
 
-        holder.tvInitials.text    = user.initials
-        holder.tvUserName.text    = user.name
+        // ১. Name Display Logic (Jodi name empty thake, tobe backup text show kora)
+        val displayName = if (user.name.isNullOrBlank()) "Unknown User" else user.name
+        holder.tvUserName.text = displayName
+
+        // ২. Initials Logic
+        holder.tvInitials.text = if (!user.initials.isNullOrBlank()) {
+            user.initials
+        } else {
+            displayName.take(1).uppercase()
+        }
+
         holder.tvLastMessage.text = user.lastMessage
         holder.tvTime.text        = user.time
 
+        // আনরিড কাউন্ট লজিক
         if (user.unreadCount > 0) {
             holder.tvUnreadCount.visibility = View.VISIBLE
             holder.tvUnreadCount.text       = user.unreadCount.toString()
@@ -46,13 +63,16 @@ class ChatListAdapter(
 
         holder.itemView.setOnClickListener { onClick(user) }
     }
-
     override fun getItemCount() = userList.size
 
+    // ৩. সার্চ ফিল্টার
     fun filter(query: String) {
-        userList = if (query.isEmpty()) originalList
-        else originalList.filter {
-            it.name.contains(query, ignoreCase = true)
+        userList = if (query.isEmpty()) {
+            originalList
+        } else {
+            originalList.filter {
+                it.name.contains(query, ignoreCase = true)
+            }
         }
         notifyDataSetChanged()
     }
